@@ -21,13 +21,13 @@ module Scc
           end
 
           opts.on("-h", "--help", "Prints this help") do
+            options[:early_exit] = true
             puts opts
-            exit
           end
 
           opts.on("-v", "--version", "Prints gem version") do
+            options[:early_exit] = true
             puts Scc::VERSION
-            exit
           end
         end.parse!(argv)
 
@@ -38,12 +38,18 @@ module Scc
         argv = %w[-h] if argv.empty?
         options = parse_args(argv)
 
+        # early exits
+        return options[:early_exit] if options[:early_exit]
+
         deploy_info = Scc::DeployInfo.from_git(root: options[:git_root])
         deploy_info.extract!
 
         open_and_yield(options[:output_file]) do |f|
           f.puts(YAML.dump(deploy_info.to_poro))
         end
+      rescue Scc::DeployInfo::Extractor::Git::NotAGitRootError => e
+        puts e.message
+        1
       end
 
       private
@@ -56,6 +62,8 @@ module Scc
         end
 
         yield output_file
+
+        output_file.close
       end
     end
   end

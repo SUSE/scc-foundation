@@ -2,4 +2,4 @@
 
 require "scc/commands/build_manifest_from_git"
 
-Scc::Commands::BuildManifestFromGit.new.call(ARGV)
+exit Scc::Commands::BuildManifestFromGit.new.call(ARGV)

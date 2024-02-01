@@ -20,6 +20,14 @@ RSpec.describe Scc::Utils do
       end
     end
 
+    context "when input is nil" do
+      let(:input_value) { nil }
+
+      it "returns nil" do
+        expect(subject).to be_nil
+      end
+    end
+
     [Date, DateTime, Time].each do |klass|
       context "when input is #{klass.name}" do
         let(:input_value) { klass.new }
