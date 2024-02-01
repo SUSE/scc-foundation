@@ -11,7 +11,7 @@ RSpec.describe Scc::DeployInfo do
       let(:tmpfile) do
         Tempfile.new("deploy-info-sample").tap do |f|
           f.write(load_file_fixture("deploy_info/valid_deploy_info.yml"))
-          f.rewind
+          f.close
         end
       end
 
@@ -26,11 +26,30 @@ RSpec.describe Scc::DeployInfo do
       end
     end
 
+    context "with a valid file missing a key" do
+      let(:tmpfile) do
+        Tempfile.new("deploy-info-sample").tap do |f|
+          f.write(load_file_fixture("deploy_info/valid_deploy_info_missing_a_key.yml"))
+          f.close
+        end
+      end
+
+      after { tmpfile.unlink }
+
+      let(:obj) do
+        described_class.from_file(filename: Pathname(tmpfile.path)).extract!
+      end
+
+      it "loads from deploy info file" do
+        expect(obj.version_string).to eq("UNKNOWN/file_sha @ 31 Jan 2022 16:47")
+      end
+    end
+
     context "with an empty file" do
       let(:tmpfile) do
         Tempfile.new("deploy-info-empty").tap do |f|
           f.write("")
-          f.rewind
+          f.close
         end
       end
 
@@ -49,7 +68,7 @@ RSpec.describe Scc::DeployInfo do
       let(:tmpfile) do
         Tempfile.new("deploy-info-sample").tap do |f|
           f.write(load_file_fixture("deploy_info/bad_structure.yml"))
-          f.rewind
+          f.close
         end
       end
 
@@ -68,7 +87,7 @@ RSpec.describe Scc::DeployInfo do
       let(:tmpfile) do
         Tempfile.new("deploy-info-sample").tap do |f|
           f.write(load_file_fixture("deploy_info/invalid_yaml_syntax.yml"))
-          f.rewind
+          f.close
         end
       end
 

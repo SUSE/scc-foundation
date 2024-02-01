@@ -59,10 +59,12 @@ module Scc
     end
 
     def self.for_env(env, root: nil, filename: nil)
-      return from_git(root: root) if %w[test development].include?(env)
-      from_file(filename: filename)
+      if %w[test development].include?(env)
+        return from_git(root: root).extract!
+      end
+      from_file(filename: filename).extract!
     rescue DeployInfo::Extractor::Error
-      new
+      new.extract!
     end
 
     private

@@ -8,6 +8,9 @@ module Scc
   class DeployInfo
     module Extractor
       class File < Dummy
+        class ManifestNotFound < Error
+        end
+
         class ManifestEmpty < Error
         end
 
@@ -31,7 +34,9 @@ module Scc
           deploy_info[:origin] = "FILE"
           deploy_info[:commit_date] = Scc::Utils.try_parse_date(deploy_info[:commit_date])
           deploy_info
-        rescue ::Psych::Exception # rescue YAML parsing errors
+        rescue ::Errno::ENOENT, Errno::EISDIR
+          raise ManifestNotFound, "Could not find manifest file in #{@filename}"
+        rescue ::Psych::Exception # YAML parsing errors
           raise ManifestInvalid, "Could not parse YAML from manifest file"
         end
       end
