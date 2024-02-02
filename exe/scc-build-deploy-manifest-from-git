@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require "scc/commands/build_manifest_from_git"
+
+exit Scc::Commands::BuildManifestFromGit.new.call(ARGV)
