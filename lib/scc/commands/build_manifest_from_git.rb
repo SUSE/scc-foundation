@@ -47,6 +47,8 @@ module Scc
         open_and_yield(options[:output_file]) do |f|
           f.puts(YAML.dump(deploy_info.to_poro))
         end
+
+        0
       rescue Scc::DeployInfo::Extractor::Git::NotAGitRootError => e
         puts e.message
         1
