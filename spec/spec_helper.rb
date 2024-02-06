@@ -44,6 +44,9 @@ def make_git_repo_and_return_date(git_dir)
 end
 
 def deploy_info_yaml_from_git_template(git_commit)
+  # YAML1.1 is one of those things... :')
+  git_commit = "'#{git_commit}'" if /\A0[0-7]*[89]/.match?(git_commit)
+
   <<~CONTENT
     ---
     deploy_ref: main
