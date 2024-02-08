@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "scc/utils"
+require_relative "dummy"
 require "English"
 
 module Scc
@@ -13,6 +14,9 @@ module Scc
         class NotAGitRootError < Error
         end
 
+        class GitNotFound < Error
+        end
+
         attr_reader :root
 
         def initialize(root: ".")
@@ -20,6 +24,8 @@ module Scc
         end
 
         def call
+          raise NotAGitRootError, "git root not found at '#{root}'" unless Dir.exist?(root)
+
           parts = Dir.chdir(root) do
             IO.popen(git_show_command, err: "/dev/null", &:read).strip.split(GIT_SHOW_SEPARATOR)
           end
@@ -39,7 +45,7 @@ module Scc
             origin: :git
           }.compact)
         rescue Errno::ENOENT
-          raise NotAGitRootError, "git root not found at '#{root}'"
+          raise GitNotFound, "git command (#{git_show_command.join(" ")}) not found"
         end
 
         private
