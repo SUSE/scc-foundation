@@ -13,10 +13,10 @@ end
 # / Making things testable sometimes suck...
 
 RSpec.describe Scc::Instrumentable do
-  describe "#instrumentation_namespace" do
+  describe ".instrumentation_namespace" do
     context "when class is not namespaced" do
       subject do
-        TopLevelClassSubject.include(described_class).new
+        TopLevelClassSubject.include(described_class)
       end
 
       it "returns the class name in lowercase" do
@@ -30,7 +30,7 @@ RSpec.describe Scc::Instrumentable do
 
     context "when class is namespaced" do
       subject do
-        FirstMod::SecondClass::ThirdClass.include(described_class).new
+        FirstMod::SecondClass::ThirdClass.include(described_class)
       end
 
       it "returns the class name in camelcase" do

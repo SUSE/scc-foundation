@@ -1,5 +1,10 @@
 ## [Unreleased]
 
+## [0.1.2] - 2024-05-02
+
+- Allow classes consuming `Scc::Instrumentable` to expose the namespace where
+  they report.
+
 ## [0.1.1] - 2024-05-01
 
 - Add a thin layer on top of `ActiveSupport::Instrumentation`
