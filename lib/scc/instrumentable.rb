@@ -45,9 +45,7 @@ module Scc
 
     def instrument(event, payload = nil, &block)
       namespace = instrumentation_namespace
-      ActiveSupport::Notifications.instrument("#{event}.#{namespace}", payload) do
-        block&.call
-      end
+      ActiveSupport::Notifications.instrument("#{event}.#{namespace}", payload, &block)
     end
 
     ##

@@ -64,10 +64,38 @@ RSpec.describe Scc::Instrumentable do
         .with("event.top_level_class_subject", nil)
     end
 
-    it "forwards the payload to ActiveSupport" do
+    it "forwards the payload to ActiveSupport::Notifications" do
       allow(ActiveSupport::Notifications).to receive(:instrument)
 
       subject.instrument("event", {data: :extra}) { 2 + 2 }
+
+      expect(ActiveSupport::Notifications).to have_received(:instrument)
+        .once
+        .with("event.top_level_class_subject", {data: :extra})
+    end
+
+    # Not doubling ActiveSupport::Notifications in these tests
+    it "accepts mutations to the payload" do
+      allow(ActiveSupport::Notifications).to receive(:instrument).and_call_original
+
+      expect {
+        subject.instrument("event", {data: :extra}) do |params|
+          params[:something] = :else
+
+          2 + 2
+        end
+      }.not_to raise_error
+
+      expect(ActiveSupport::Notifications).to have_received(:instrument)
+        .once
+        .with("event.top_level_class_subject", {data: :extra, something: :else})
+    end
+
+    it "returns the value from the block just like ActiveSupport::Notifications" do
+      allow(ActiveSupport::Notifications).to receive(:instrument).and_call_original
+
+      ret = subject.instrument("event", {data: :extra}) { 2 + 2 }
+      expect(ret).to eq(4)
 
       expect(ActiveSupport::Notifications).to have_received(:instrument)
         .once
