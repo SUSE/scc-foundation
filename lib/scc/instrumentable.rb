@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "active_support/concern"
 require "active_support/notifications"
 require "active_support/core_ext/string/inflections"
 
@@ -9,6 +10,7 @@ require "active_support/core_ext/string/inflections"
 # Autodetect's the namespace of the event based on the consumer class.
 module Scc
   module Instrumentable
+    extend ActiveSupport::Concern
     ##
     # Instrument an operation.
     #
@@ -56,13 +58,19 @@ module Scc
     #
     # @returns [String] the instrumentation namespace
     def instrumentation_namespace
-      @instrumentation_namespace ||= default_instrumentation_namespace
+      @instrumentation_namespace ||= self.class.instrumentation_namespace
     end
 
-    protected
+    module ClassMethods
+      def instrumentation_namespace
+        default_instrumentation_namespace
+      end
 
-    def default_instrumentation_namespace
-      self.class.name.split("::").map(&:underscore).reverse.join(".")
+      protected
+
+      def default_instrumentation_namespace
+        name.split("::").map(&:underscore).reverse.join(".")
+      end
     end
   end
 end
